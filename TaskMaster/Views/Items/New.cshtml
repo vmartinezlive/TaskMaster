@@ -1,0 +1,18 @@
+@{
+  Layout = "_Layout";
+}
+<div class="container">
+    <h1>TaskMaster</h1>
+
+    <h2>Add a new item to @Model.GetName()</h2>
+
+    <form action='/categories/@Model.GetId()/items' method='post'>
+      <input id='categoryId' name='categoryId' type='hidden' value='@Model.GetId()'>
+      <label for='itemDescription'>Item description</label>
+      <input id='itemDescription' name='itemDescription' type='text'>
+      <button type='submit'>Add item</button>
+    </form>
+
+    <h4><a href='/'>Home</a></h4>
+
+</div>
