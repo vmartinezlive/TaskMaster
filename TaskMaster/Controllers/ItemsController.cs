@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using TaskMaster.Models;
+using System.Collections.Generic;
 
 namespace TaskMaster.Controllers
 {
@@ -12,13 +12,6 @@ namespace TaskMaster.Controllers
     {
        Category category = Category.Find(categoryId);
        return View(category);
-    }
-
-    [HttpPost("/items")]
-    public ActionResult Create(string description)
-    {
-      Item myItem = new Item(description);
-      return RedirectToAction("Index");
     }
 
     [HttpGet("/categories/{categoryId}/items/{itemId}")]

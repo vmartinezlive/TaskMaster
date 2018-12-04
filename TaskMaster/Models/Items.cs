@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace TaskMaster.Models
 {
@@ -23,46 +24,56 @@ namespace TaskMaster.Models
       _description = newDescription;
     }
 
-    // public int GetId()
-    // {
-    //   return _id;
-    // }
+    public int GetId()
+    {
+      // Temporarily returning dummy id to get beyond compiler errors, until we refactor to work with database.
+      return 0;
+    }
 
     public static List<Item> GetAll()
     {
-      List<Item> allItems = new List<Item> {};
+      List<Item> allItems = new List<Item> { };
       MySqlConnection conn = DB.Connection();
       conn.Open();
       MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
       cmd.CommandText = @"SELECT * FROM items;";
       MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
-
       while(rdr.Read())
       {
-        int itemdId = rdr.GetInt32(0);
+        int itemId = rdr.GetInt32(0);
         string itemDescription = rdr.GetString(1);
-        Item newItem = new Item(itemDescription, itemId);
+        // Line below now only provides one argument!
+        Item newItem = new Item(itemDescription);
         allItems.Add(newItem);
       }
-
       conn.Close();
-
-      if (conn!= null)
+      if (conn != null)
       {
         conn.Dispose();
       }
       return allItems;
     }
 
-    // public static void ClearAll()
-    // {
-    //   _instances.Clear();
-    // }
-    //
-    // public static Item Find(int searchId)
-    // {
-    //   return _instances[searchId-1];
-    // }
+    public static void ClearAll()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"DELETE FROM items;";
+      cmd.ExecuteNonQuery();
+      conn.Close();
+      if (conn != null)
+      {
+       conn.Dispose();
+      }
+    }
+
+    public static Item Find(int searchId)
+    {
+      // Temporarily returning dummy item to get beyond compiler errors, until we refactor to work with database.
+      Item dummyItem = new Item("dummy item");
+      return dummyItem;
+    }
 
   }
 }
