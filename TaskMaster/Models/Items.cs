@@ -6,12 +6,26 @@ namespace TaskMaster.Models
   public class Item
   {
     private string _description;
-    // private int _id;
+    private int _id;
 
-    public Item (string description)
+    public Item (string description, int id = 0)
     {
       _description = description;
-      // _id = _instances.Count;
+      _id = _id;
+    }
+
+    public override bool Equals(System.Object otherItem)
+    {
+      if (!(otherItem is Item))
+      {
+        return false;
+      }
+      else
+      {
+        Item newItem = (Item) otherItem;
+        bool descriptionEquality = (this.GetDescription() == newItem.GetDescription());
+        return (descriptionEquality);
+      }
     }
 
     public string GetDescription()
@@ -24,10 +38,32 @@ namespace TaskMaster.Models
       _description = newDescription;
     }
 
+    public void Save()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO items (description) VALUES (@ItemDescription);";
+
+      MySqlParameter description = new MySqlParameter();
+      description.ParameterName = "@ItemDescription";
+      description.Value = this._description;
+      cmd.Parameters.Add(description);
+
+      cmd.ExecuteNonQuery();
+      _id = (int) cmd.LastInsertId;
+
+      conn.Close();
+      if(conn != null)
+      {
+        conn.Dispose();
+      }
+    }
+
     public int GetId()
     {
-      // Temporarily returning dummy id to get beyond compiler errors, until we refactor to work with database.
-      return 0;
+      return _id;
     }
 
     public static List<Item> GetAll()
