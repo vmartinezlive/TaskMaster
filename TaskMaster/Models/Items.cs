@@ -11,21 +11,7 @@ namespace TaskMaster.Models
     public Item (string description, int id = 0)
     {
       _description = description;
-      _id = _id;
-    }
-
-    public override bool Equals(System.Object otherItem)
-    {
-      if (!(otherItem is Item))
-      {
-        return false;
-      }
-      else
-      {
-        Item newItem = (Item) otherItem;
-        bool descriptionEquality = (this.GetDescription() == newItem.GetDescription());
-        return (descriptionEquality);
-      }
+      _id = id;
     }
 
     public string GetDescription()
@@ -36,29 +22,6 @@ namespace TaskMaster.Models
     public void SetDescription(string newDescription)
     {
       _description = newDescription;
-    }
-
-    public void Save()
-    {
-      MySqlConnection conn = DB.Connection();
-      conn.Open();
-
-      var cmd = conn.CreateCommand() as MySqlCommand;
-      cmd.CommandText = @"INSERT INTO items (description) VALUES (@ItemDescription);";
-
-      MySqlParameter description = new MySqlParameter();
-      description.ParameterName = "@ItemDescription";
-      description.Value = this._description;
-      cmd.Parameters.Add(description);
-
-      cmd.ExecuteNonQuery();
-      _id = (int) cmd.LastInsertId;
-
-      conn.Close();
-      if(conn != null)
-      {
-        conn.Dispose();
-      }
     }
 
     public int GetId()
@@ -78,8 +41,7 @@ namespace TaskMaster.Models
       {
         int itemId = rdr.GetInt32(0);
         string itemDescription = rdr.GetString(1);
-        // Line below now only provides one argument!
-        Item newItem = new Item(itemDescription);
+        Item newItem = new Item(itemDescription, itemId);
         allItems.Add(newItem);
       }
       conn.Close();
@@ -104,11 +66,70 @@ namespace TaskMaster.Models
       }
     }
 
-    public static Item Find(int searchId)
+    public static Item Find(int id)
     {
-      // Temporarily returning dummy item to get beyond compiler errors, until we refactor to work with database.
-      Item dummyItem = new Item("dummy item");
-      return dummyItem;
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT * FROM items WHERE id = @thisId;";
+      MySqlParameter thisId = new MySqlParameter();
+      thisId.ParameterName = "@thisId";
+      thisId.Value = id;
+      cmd.Parameters.Add(thisId);
+      MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+      int itemId = 0;
+      string itemDescription = "";
+      while (rdr.Read())
+      {
+        itemId = rdr.GetInt32(0);
+        itemDescription = rdr.GetString(1);
+      }
+      Item foundItem = new Item(itemDescription, itemId);
+
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return foundItem;
+    }
+
+    public override bool Equals(System.Object otherItem)
+    {
+      if (!(otherItem is Item))
+      {
+        return false;
+      }
+      else
+      {
+        Item newItem = (Item) otherItem;
+        bool idEquality = (this.GetId() == newItem.GetId());
+        bool descriptionEquality = (this.GetDescription() == newItem.GetDescription());
+        return (idEquality && descriptionEquality);
+      }
+    }
+    public void Save()
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO items (description) VALUES (@ItemDescription);";
+
+      MySqlParameter description = new MySqlParameter();
+      description.ParameterName = "@ItemDescription";
+      description.Value = this._description;
+      cmd.Parameters.Add(description);
+
+      cmd.ExecuteNonQuery();
+      _id = (int) cmd.LastInsertedId;
+
+      conn.Close();
+      if(conn != null)
+      {
+        conn.Dispose();
+      }
     }
 
   }
