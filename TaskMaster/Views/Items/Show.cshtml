@@ -2,11 +2,14 @@
   Layout = "_Layout";
 }
 <div class="container">
-    <h1>TaskMaster Item Details:</h1>
+  <h1>TaskMaster Item Details:</h1>
 
-    <h2>@Model["item"].GetDescription()</h2>
-    <h3>Category: @Model["category"].GetName()</h3>
+  <h2>@Model["item"].GetDescription()</h2>
+  <h3>Category: @Model["category"].GetName()</h3>
 
-    <a href='/categories/@Model["category"].GetId()/items/new'>Add another item</a>
-    <a href='/categories'>View all categories</a>
+  <div>
+    <h4><a href='/categories/@Model["category"].GetId()/items/@Model["item"].GetId()/edit'>Edit this Item</a></h4>
+    <h4><a href='/categories/@Model["category"].GetId()/items/new'>Add another item</a></h4>
+    <h4><a href='/categories'>View all categories</a></h4>
+  </div>
 </div>
